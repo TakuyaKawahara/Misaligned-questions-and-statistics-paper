@@ -1,4 +1,3 @@
-# RESTART R! Rstudio shortcut: Ctrl+Shift+F10
 
 library(tidyverse)
 library(gtsummary)
@@ -119,7 +118,7 @@ data_prost_long <- data_prost_long %>%
   mutate(
     ipcw_odeath_unstab = 1/cum_pred_odeath,
   )
-
+summary(data_prost_long$ipcw_odeath_unstab)
 
 ######################################################################################
 #### Step 3-CDE. Estimation of the controlled direct effect with utility function
@@ -230,6 +229,8 @@ data_prost_long_sde <- bind_cols(data_prost_long1, data_prost_long0, data_other)
     w_s0 = I(rx==1)*cum_pred_odeath0/cum_pred_odeath1 + I(rx==0)*cum_pred_odeath0/cum_pred_odeath0,
     # w_s0 : weight for aD=0
   )  
+summary(data_prost_long_sde$w_s1)
+summary(data_prost_long_sde$w_s0)
 
 ######################################################################################
 #### Step 3-SDE. Estimation of the separable direct effect with utility function
