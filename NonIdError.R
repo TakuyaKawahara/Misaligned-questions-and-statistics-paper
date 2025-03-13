@@ -218,7 +218,7 @@ d2 <- ggplot(data=b2, aes(tsde0, tilde_sde0)) +
   ggtitle(expression(paste("Separable direct effect", " (", {a[D]},"=0)", sep="")))
 #d2
 
-d3 <- ggplot(data=b2, aes(tsde0, tilde_sde0)) + 
+d3 <- ggplot(data=b2, aes(tsde1, tilde_sde1)) + 
   geom_point() +
   geom_abline(slope=1, intercept=0) +
   geom_vline(xintercept = 0) +
