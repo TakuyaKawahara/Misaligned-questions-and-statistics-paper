@@ -13,12 +13,6 @@ parametersDF <- merge(setting,param)
 
 current_day <- Sys.time() 
 format_day <- format(current_day, "%Y%m%d_%H%M%S")
-zz <- file(paste("log_scenario", filename,"_", format_day, ".txt", sep=""), open="wt")
-sink(file=zz, split =T) 
-
-library(tictoc)
-tic("sleeping")
-print("start computing...")
 
 library("dplyr")
 library("here")
@@ -83,16 +77,6 @@ result_all <- foreach(scenario = 1:slots,
 stopCluster(cluster)
 
 
-
-result_all %>% select(wcde_11, wcde_10, wcde_01, wcde_00, wsde0_11, wsde0_10) %>% summary()
-result_all %>% select(bias_cdecde, bias_cdesde0, bias1_sde0, bias2, bias3, bias3_cde_1,bias3_cde_0, bias2_sde0,bias3_sde0
-                      , bias3_cde_1l1, bias3_cde_1l0, bias3_cde_0l1, bias3_cde_0l0 ) %>% summary()
-result_all %>% select(bias3, bias3_sde0, bias3_cde_1l1, bias3_cde_1l0, bias3_cde_0l1, bias3_cde_0l0) %>% var()
-
-
-print("...end computing")
-toc()
-sink()
 
 # Save result_all ----------------------------
 write.csv(result_all, file=paste("result_all_scenario", filename, "_", format_day, ".csv", sep=""), fileEncoding = "CP932")

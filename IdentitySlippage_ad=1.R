@@ -1,7 +1,6 @@
 
 library(dplyr)
 library(ggplot2)
-#library(latex2exp)
 library(patchwork)
 
 
@@ -21,34 +20,6 @@ tcov <- function(c_0, c_1, u){
   output <- exp(linear_pred)/(1+exp(linear_pred))
   return(output)
 }
-
-
-
-# m <- c(-1, 1)
-# n <- c(-1, 1)
-# o <- c(-1, 1)
-# p <- c(-1, 1)
-# q <- c(-1, 1)
-# r <- c(-1, 1)
-# s <- c(-1, 1)
-# t <- c(-1, 1)
-# u <- c(-1, 1)
-# v <- c(-1, 1)
-# w <- c(-1, 1)
-# x <- c(-1, 1)
-
-# m <- c(-1, 1,2)
-# n <- c(-1, 1,2)
-# o <- c(-1, 1,2)
-# p <- c(-1, 1,2)
-# q <- c(-1, 1,2)
-# r <- c(-1, 1,2)
-# s <- c(-1, 1,2)
-# t <- c(-1, 1,2)
-# u <- c(-1, 1,2)
-# v <- c(-1, 1,2)
-# w <- c(-1, 1,2)
-# x <- c(-1, 1,2)
 
 m <- c(-2, -1, 1,2)
 n <- c(-2, -1, 1,2)
@@ -81,8 +52,8 @@ b <- sim %>%
     beta_6=x/2
   )
 
-## setting1:U exists and D is rare
-beta_0 <- -6
+## setting1: U exists and D is rare
+beta_0 <- -9
 theta_0 <- -1
 pL <- 0.5
 phi_0 <- 0
@@ -153,32 +124,13 @@ b2 <- b %>%
     tsde1 = tsde11 - tsde01,
     tsde0 = tsde10 - tsde00,
 
-    # dif_cdesde1 = hat_cde - hat_sde1,
-    # dif_cdesde0 = hat_cde - hat_sde0,
-    # dif_sde1sde0 = hat_sde1 - hat_sde0,
-    # bias_cdecde = hat_cde - tcde,
-    # bias_sde1sde1 = hat_sde1 - tsde1,
-    # bias_sde0sde0 = hat_sde0 - tsde0,
-    # bias_cdesde1 = hat_cde - tsde1,
-    # bias_cdesde0 = hat_cde - tsde0,
     tilde_cde = tilde_cde1 - tilde_cde0,
     tilde_sde1 = tilde_sde11 - tilde_sde10,
     tilde_sde0 = tilde_sde01 - tilde_sde00,
-    bias1 = tcde - tsde0,
-    bias2 = tilde_cde - tcde,
-    # bias3 = hat_cde - tilde_cde,
-    bias2_sde0 = tilde_sde0 - tsde0,
-    # bias3_sde0 = hat_sde0 - tilde_sde0,
-    # bias3_cde_1 = est_abs$hat_cde1 - tilde_cde1,
-    # bias3_cde_0 = est_abs$hat_cde0 - tilde_cde0,
-    # bias3_cde_1l1 = est_abs$hat_cde1l1 - tilde_cde1l1,
-    # bias3_cde_1l0 = est_abs$hat_cde1l0 - tilde_cde1l0,
-    # bias3_cde_0l1 = est_abs$hat_cde0l1 - tilde_cde0l1,
-    # bias3_cde_0l0 = est_abs$hat_cde0l0 - tilde_cde0l0,
-    
-    sign = as.factor(ifelse(tcde*tsde1<0, 1, 0)),
-    ratio = tsde1/tcde,
-    dif = tsde1 - tcde,
+
+    sign = as.factor(ifelse(tcde*tsde0<0, 1, 0)),
+    ratio = tsde0/tcde,
+    dif = tsde0 - tcde,
   )
 max(b2$tpi111)
 d1 <- ggplot(data=b2, aes(tcde, tsde1, colour=sign)) + 
@@ -197,8 +149,9 @@ d1 <- ggplot(data=b2, aes(tcde, tsde1, colour=sign)) +
   ) +
   coord_fixed(xlim=c(-0.45, 0.45),ylim=c(-0.45, 0.45))  + 
   ggtitle("(a) D is rare and U exists")+
-  scale_color_manual(values=(c("black", "red")))
-#d1
+  #scale_color_manual(values=(c("black", "red")))
+  scale_color_manual(values=(c("black", "black")))
+  #d1
 
 
 
@@ -274,32 +227,13 @@ b2 <- b %>%
     tsde1 = tsde11 - tsde01,
     tsde0 = tsde10 - tsde00,
     
-    # dif_cdesde1 = hat_cde - hat_sde1,
-    # dif_cdesde0 = hat_cde - hat_sde0,
-    # dif_sde1sde0 = hat_sde1 - hat_sde0,
-    # bias_cdecde = hat_cde - tcde,
-    # bias_sde1sde1 = hat_sde1 - tsde1,
-    # bias_sde0sde0 = hat_sde0 - tsde0,
-    # bias_cdesde1 = hat_cde - tsde1,
-    # bias_cdesde0 = hat_cde - tsde0,
     tilde_cde = tilde_cde1 - tilde_cde0,
     tilde_sde1 = tilde_sde11 - tilde_sde10,
     tilde_sde0 = tilde_sde01 - tilde_sde00,
-    bias1 = tcde - tsde0,
-    bias2 = tilde_cde - tcde,
-    # bias3 = hat_cde - tilde_cde,
-    bias2_sde0 = tilde_sde0 - tsde0,
-    # bias3_sde0 = hat_sde0 - tilde_sde0,
-    # bias3_cde_1 = est_abs$hat_cde1 - tilde_cde1,
-    # bias3_cde_0 = est_abs$hat_cde0 - tilde_cde0,
-    # bias3_cde_1l1 = est_abs$hat_cde1l1 - tilde_cde1l1,
-    # bias3_cde_1l0 = est_abs$hat_cde1l0 - tilde_cde1l0,
-    # bias3_cde_0l1 = est_abs$hat_cde0l1 - tilde_cde0l1,
-    # bias3_cde_0l0 = est_abs$hat_cde0l0 - tilde_cde0l0,
-    
-    sign = as.factor(ifelse(tcde*tsde1<0, 1, 0)),
-    ratio = tsde1/tcde,
-    dif = tsde1 - tcde,
+
+    sign = as.factor(ifelse(tcde*tsde0<0, 1, 0)),
+    ratio = tsde0/tcde,
+    dif = tsde0 - tcde,
   )
 max(b2$tpi111)
 d2 <- ggplot(data=b2, aes(tcde, tsde1, colour=sign)) + 
@@ -318,17 +252,18 @@ d2 <- ggplot(data=b2, aes(tcde, tsde1, colour=sign)) +
   ) +
   coord_fixed(xlim=c(-0.45, 0.45),ylim=c(-0.45, 0.45))  + 
   ggtitle("(b) D is non-rare and U exists")+
-  scale_color_manual(values=(c("black", "red")))
+  #scale_color_manual(values=(c("black", "red")))
+  scale_color_manual(values=(c("black", "black")))
 #d2
 
 
 ## setting 3 : U not exists and D is rare
-beta_0 <- -4
+beta_0 <- -6
 theta_0 <- -1
 pL <- 0.5
 phi_0 <- 0
 phi_1 <- 0
-pU <- 0
+pU <- 0.5
 if(phi_0 == 0 & phi_1 == 0){
   tg11 <-  pL*pU
   tg10 <-  pL*(1-pU)
@@ -342,6 +277,13 @@ if(phi_0 == 0 & phi_1 == 0){
 }
 b2 <- b %>%
   mutate(
+    theta_4 = 0,
+    theta_5 = 0,
+    theta_6 = 0,
+    beta_4 = 0,
+    beta_5 = 0,
+    beta_6 = 0,
+    
     tmu111 = tevent(c_0 = theta_0, c_1 = theta_1, c_2 = theta_2, c_3 = theta_3, c_4 = theta_4, c_5 = theta_5, c_6 = theta_6, a = 1, l = 1, u = 1),
     tmu110 = tevent(c_0 = theta_0, c_1 = theta_1, c_2 = theta_2, c_3 = theta_3, c_4 = theta_4, c_5 = theta_5, c_6 = theta_6, a = 1, l = 1, u = 0),
     tmu101 = tevent(c_0 = theta_0, c_1 = theta_1, c_2 = theta_2, c_3 = theta_3, c_4 = theta_4, c_5 = theta_5, c_6 = theta_6, a = 1, l = 0, u = 1),
@@ -394,32 +336,13 @@ b2 <- b %>%
     tsde1 = tsde11 - tsde01,
     tsde0 = tsde10 - tsde00,
     
-    # dif_cdesde1 = hat_cde - hat_sde1,
-    # dif_cdesde0 = hat_cde - hat_sde0,
-    # dif_sde1sde0 = hat_sde1 - hat_sde0,
-    # bias_cdecde = hat_cde - tcde,
-    # bias_sde1sde1 = hat_sde1 - tsde1,
-    # bias_sde0sde0 = hat_sde0 - tsde0,
-    # bias_cdesde1 = hat_cde - tsde1,
-    # bias_cdesde0 = hat_cde - tsde0,
     tilde_cde = tilde_cde1 - tilde_cde0,
     tilde_sde1 = tilde_sde11 - tilde_sde10,
     tilde_sde0 = tilde_sde01 - tilde_sde00,
-    bias1 = tcde - tsde0,
-    bias2 = tilde_cde - tcde,
-    # bias3 = hat_cde - tilde_cde,
-    bias2_sde0 = tilde_sde0 - tsde0,
-    # bias3_sde0 = hat_sde0 - tilde_sde0,
-    # bias3_cde_1 = est_abs$hat_cde1 - tilde_cde1,
-    # bias3_cde_0 = est_abs$hat_cde0 - tilde_cde0,
-    # bias3_cde_1l1 = est_abs$hat_cde1l1 - tilde_cde1l1,
-    # bias3_cde_1l0 = est_abs$hat_cde1l0 - tilde_cde1l0,
-    # bias3_cde_0l1 = est_abs$hat_cde0l1 - tilde_cde0l1,
-    # bias3_cde_0l0 = est_abs$hat_cde0l0 - tilde_cde0l0,
-    
-    sign = as.factor(ifelse(tcde*tsde1<0, 1, 0)),
-    ratio = tsde1/tcde,
-    dif = tsde1 - tcde,
+
+    sign = as.factor(ifelse(tcde*tsde0<0, 1, 0)),
+    ratio = tsde0/tcde,
+    dif = tsde0 - tcde,
   )
 max(b2$tpi111)
 d3 <- ggplot(data=b2, aes(tcde, tsde1, colour=sign)) + 
@@ -438,7 +361,8 @@ d3 <- ggplot(data=b2, aes(tcde, tsde1, colour=sign)) +
   ) +
   coord_fixed(xlim=c(-0.45, 0.45),ylim=c(-0.45, 0.45))  + 
   ggtitle("(c) D is rare and U is absent")+
-  scale_color_manual(values=(c("black", "red")))
+  #scale_color_manual(values=(c("black", "red")))
+  scale_color_manual(values=(c("black", "black")))
 #d3
 
 
@@ -449,7 +373,7 @@ theta_0 <- -1
 pL <- 0.5
 phi_0 <- 0
 phi_1 <- 0
-pU <- 0
+pU <- 0.5
 if(phi_0 == 0 & phi_1 == 0){
   tg11 <-  pL*pU
   tg10 <-  pL*(1-pU)
@@ -463,6 +387,13 @@ if(phi_0 == 0 & phi_1 == 0){
 }
 b2 <- b %>%
   mutate(
+    theta_4 = 0,
+    theta_5 = 0,
+    theta_6 = 0,
+    beta_4 = 0,
+    beta_5 = 0,
+    beta_6 = 0,
+    
     tmu111 = tevent(c_0 = theta_0, c_1 = theta_1, c_2 = theta_2, c_3 = theta_3, c_4 = theta_4, c_5 = theta_5, c_6 = theta_6, a = 1, l = 1, u = 1),
     tmu110 = tevent(c_0 = theta_0, c_1 = theta_1, c_2 = theta_2, c_3 = theta_3, c_4 = theta_4, c_5 = theta_5, c_6 = theta_6, a = 1, l = 1, u = 0),
     tmu101 = tevent(c_0 = theta_0, c_1 = theta_1, c_2 = theta_2, c_3 = theta_3, c_4 = theta_4, c_5 = theta_5, c_6 = theta_6, a = 1, l = 0, u = 1),
@@ -514,33 +445,14 @@ b2 <- b %>%
     tcde = tcde1 - tcde0,
     tsde1 = tsde11 - tsde01,
     tsde0 = tsde10 - tsde00,
-    
-    # dif_cdesde1 = hat_cde - hat_sde1,
-    # dif_cdesde0 = hat_cde - hat_sde0,
-    # dif_sde1sde0 = hat_sde1 - hat_sde0,
-    # bias_cdecde = hat_cde - tcde,
-    # bias_sde1sde1 = hat_sde1 - tsde1,
-    # bias_sde0sde0 = hat_sde0 - tsde0,
-    # bias_cdesde1 = hat_cde - tsde1,
-    # bias_cdesde0 = hat_cde - tsde0,
+
     tilde_cde = tilde_cde1 - tilde_cde0,
     tilde_sde1 = tilde_sde11 - tilde_sde10,
     tilde_sde0 = tilde_sde01 - tilde_sde00,
-    bias1 = tcde - tsde0,
-    bias2 = tilde_cde - tcde,
-    # bias3 = hat_cde - tilde_cde,
-    bias2_sde0 = tilde_sde0 - tsde0,
-    # bias3_sde0 = hat_sde0 - tilde_sde0,
-    # bias3_cde_1 = est_abs$hat_cde1 - tilde_cde1,
-    # bias3_cde_0 = est_abs$hat_cde0 - tilde_cde0,
-    # bias3_cde_1l1 = est_abs$hat_cde1l1 - tilde_cde1l1,
-    # bias3_cde_1l0 = est_abs$hat_cde1l0 - tilde_cde1l0,
-    # bias3_cde_0l1 = est_abs$hat_cde0l1 - tilde_cde0l1,
-    # bias3_cde_0l0 = est_abs$hat_cde0l0 - tilde_cde0l0,
-    
-    sign = as.factor(ifelse(tcde*tsde1<0, 1, 0)),
-    ratio = tsde1/tcde,
-    dif = tsde1 - tcde,
+
+    sign = as.factor(ifelse(tcde*tsde0<0, 1, 0)),
+    ratio = tsde0/tcde,
+    dif = tsde0 - tcde,
   )
 max(b2$tpi111)
 d4 <- ggplot(data=b2, aes(tcde, tsde1, colour=sign)) + 
@@ -559,7 +471,8 @@ d4 <- ggplot(data=b2, aes(tcde, tsde1, colour=sign)) +
   ) +
   coord_fixed(xlim=c(-0.45, 0.45),ylim=c(-0.45, 0.45))  + 
   ggtitle("(d) D is non-rare and U is absent")+
-  scale_color_manual(values=(c("black", "red")))
+  #scale_color_manual(values=(c("black", "red")))
+  scale_color_manual(values=(c("black", "black")))
 #d4
 
 
@@ -568,6 +481,5 @@ all <- (d1+d2)/(d3+d4)
 
 current_day <- Sys.time() 
 format_day <- format(current_day, "%Y%m%d_%H%M%S")
-#ggsave(paste("figures/IdentitySlippage_ad=1_", format_day, ".pdf", sep=""), dpi=100, width = 27, height = 27, units = "cm")
 ggsave(paste("figures/IdentitySlippage_ad=1_", format_day, ".png", sep=""), dpi=300, width = 27, height = 27, units = "cm")
 

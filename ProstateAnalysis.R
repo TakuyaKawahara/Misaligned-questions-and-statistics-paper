@@ -116,7 +116,7 @@ data_prost_long <- data_prost_long %>%
   ) %>% 
   ungroup() %>% 
   mutate(
-    ipcw_odeath_unstab = 1/cum_pred_odeath,
+    ipcw_odeath_unstab = (1 - otherDeath)/cum_pred_odeath,
   )
 summary(data_prost_long$ipcw_odeath_unstab)
 

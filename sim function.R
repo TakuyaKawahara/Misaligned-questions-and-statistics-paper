@@ -107,10 +107,6 @@ sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta
     est_abs <- data.frame(
       hat_cde1 = mean(sim2[which(sim2$a==1),]$cde),
       hat_cde0 = mean(sim2[which(sim2$a==0),]$cde),
-      hat_cde1l1 = mean(sim2[which(sim2$a==1 & sim2$l==1),]$cde),
-      hat_cde1l0 = mean(sim2[which(sim2$a==1 & sim2$l==0),]$cde),
-      hat_cde0l1 = mean(sim2[which(sim2$a==0 & sim2$l==1),]$cde),
-      hat_cde0l0 = mean(sim2[which(sim2$a==0 & sim2$l==0),]$cde),
       hat_sde11 = mean(sim2[which(sim2$a==1),]$sde1),
       hat_sde10 = mean(sim2[which(sim2$a==1),]$sde0),
       hat_sde01 = mean(sim2[which(sim2$a==0),]$sde1),
@@ -123,7 +119,9 @@ sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta
         hat_sde0 = hat_sde10 - hat_sde00,
       ) %>% 
       select(hat_cde, hat_sde1, hat_sde0)
-    
+  
+      
+    ## True values
     param <- data.frame(
       theta_0 = theta_0,
       theta_1 = theta_1,
@@ -195,14 +193,19 @@ sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta
     true_abs <- data.frame(
       tcde1 = tmu111*tg11 + tmu110*tg10 + tmu101*tg01 + tmu100*tg00,
       tcde0 = tmu011*tg11 + tmu010*tg10 + tmu001*tg01 + tmu000*tg00,
-      tcde1l1 = tmu111*(tg11/(tg11+tg10)) + tmu110*(tg10/(tg11+tg10)),
-      tcde1l0 = tmu101*(tg01/(tg01+tg00)) + tmu100*(tg00/(tg01+tg00)),
-      tcde0l1 = tmu011*(tg11/(tg11+tg10)) + tmu010*(tg10/(tg11+tg10)),
-      tcde0l0 = tmu001*(tg01/(tg01+tg00)) + tmu000*(tg00/(tg01+tg00)),
       tsde11 = tmu111*(1-tpi111)*tg11 + tmu110*(1-tpi110)*tg10 + tmu101*(1-tpi101)*tg01 + tmu100*(1-tpi100)*tg00,
       tsde01 = tmu011*(1-tpi111)*tg11 + tmu010*(1-tpi110)*tg10 + tmu001*(1-tpi101)*tg01 + tmu000*(1-tpi100)*tg00,
       tsde10 = tmu111*(1-tpi011)*tg11 + tmu110*(1-tpi010)*tg10 + tmu101*(1-tpi001)*tg01 + tmu100*(1-tpi000)*tg00,
-      tsde00 = tmu011*(1-tpi011)*tg11 + tmu010*(1-tpi010)*tg10 + tmu001*(1-tpi001)*tg01 + tmu000*(1-tpi000)*tg00 
+      tsde00 = tmu011*(1-tpi011)*tg11 + tmu010*(1-tpi010)*tg10 + tmu001*(1-tpi001)*tg01 + tmu000*(1-tpi000)*tg00,
+      obs_cde = tilde_cde1 - tilde_cde0,
+      obs_sde1 = tilde_sde11 - tilde_sde10,
+      obs_sde0 = tilde_sde01 - tilde_sde00,
+      obs_cde1 = tilde_cde1,
+      obs_cde0 = tilde_cde0,
+      obs_sde11 = tilde_sde11,
+      obs_sde10 = tilde_sde10,
+      obs_sde01 = tilde_sde01,
+      obs_sde00 = tilde_sde00
     )
     true_contrast <- true_abs %>% 
       mutate(
@@ -211,35 +214,8 @@ sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta
         tsde0 = tsde10 - tsde00
       ) %>% 
       select(tcde, tsde1, tsde0)
-    bias <- bind_cols(est_contrast, true_contrast) %>% 
-      mutate(
-        dif_cdesde1 = hat_cde - hat_sde1,
-        dif_cdesde0 = hat_cde - hat_sde0,
-        dif_sde1sde0 = hat_sde1 - hat_sde0,
-        bias_cdecde = hat_cde - tcde,
-        bias_sde1sde1 = hat_sde1 - tsde1,
-        bias_sde0sde0 = hat_sde0 - tsde0,
-        bias_cdesde1 = hat_cde - tsde1,
-        bias_cdesde0 = hat_cde - tsde0,
-        tilde_cde = tilde_cde1 - tilde_cde0,
-        tilde_sde1 = tilde_sde11 - tilde_sde10,
-        tilde_sde0 = tilde_sde01 - tilde_sde00,
-        bias1_sde0 = tcde - tsde0,
-        bias1_sde1 = tcde - tsde1,
-        bias2 = tilde_cde - tcde,
-        bias3 = hat_cde - tilde_cde,
-        bias2_sde0 = tilde_sde0 - tsde0,
-        bias3_sde0 = hat_sde0 - tilde_sde0,
-        bias2_sde1 = tilde_sde1 - tsde1,
-        bias3_sde1 = hat_sde1 - tilde_sde1,
-        bias3_cde_1 = est_abs$hat_cde1 - tilde_cde1,
-        bias3_cde_0 = est_abs$hat_cde0 - tilde_cde0,
-        bias3_cde_1l1 = est_abs$hat_cde1l1 - tilde_cde1l1,
-        bias3_cde_1l0 = est_abs$hat_cde1l0 - tilde_cde1l0,
-        bias3_cde_0l1 = est_abs$hat_cde0l1 - tilde_cde0l1,
-        bias3_cde_0l0 = est_abs$hat_cde0l0 - tilde_cde0l0
-      )
-    output <- bind_cols(est_weights, est_abs, est_contrast, true_abs, true_contrast, bias)
+
+    output <- bind_cols(true_contrast, true_abs, est_contrast, est_abs, est_weights)
     output_all <- bind_rows(output_all, output)
   }
   
