@@ -1,16 +1,8 @@
 
-
 sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta_5, theta_6, 
-                 beta_0, beta_1, beta_2, beta_3, beta_4, beta_5, beta_6, pL, pU, phi_0, phi_1){
-  
-  
+                 beta_0, beta_1, beta_2, beta_3, beta_4, beta_5, beta_6, pL, pU){
   
   ## functions
-  cov <- function(c_0, c_1){
-    linear_pred <- (c_0 + c_1*u)
-    output <- exp(linear_pred)/(1+exp(linear_pred))
-    return(output)
-  }
   event <- function(c_0, c_1, c_2, c_3, c_4, c_5, c_6){
     linear_pred <- (c_0 + c_1*a  + c_2*l + c_3*a*l + c_4*u + c_5*a*u + c_6*l*u)
     output <- exp(linear_pred)/(1+exp(linear_pred))
@@ -31,29 +23,15 @@ sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta
     output <- exp(linear_pred)/(1+exp(linear_pred))
     return(output)
   }
-  tcov <- function(c_0, c_1, u){
-    linear_pred <- (c_0 + c_1*u)
-    output <- exp(linear_pred)/(1+exp(linear_pred))
-    return(output)
-  }
   
-  ## data frame for stacked results
+  ## dataframe for stacked results
   output_all <- data.frame()
   
   for (i in 1:rep){
     set.seed(i+rep*num)
-    if(phi_0 == 0 & phi_1 == 0){
       u <- rbinom(n = n, size = 1, prob = pU)
       l <- rbinom(n = n, size = 1, prob = pL)
-    } else{
-      u <- rbinom(n = n, size = 1, prob = pU)
-      ul <- data.frame(u) %>% 
-        mutate(
-          l = rbinom(n = n, size = 1, prob = cov(c_0 = phi_0, c_1 = phi_1))
-        )
-      l <- ul$l
-    }
-    
+
     a <- sample(c(0,1), size = n, replace=TRUE)
     sim1 <- data.frame(ind = 1:n, a, l, u)
     sim1 <- sim1 %>% 
@@ -63,7 +41,7 @@ sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta
         prob_y = event(c_0 = theta_0, c_1 = theta_1, c_2 = theta_2, c_3 = theta_3, c_4 = theta_4, c_5 = theta_5, c_6 = theta_6), 
         y = ifelse(d==0, rbinom(n = n, size = 1, prob=prob_y), 0),
       )
-    ## Models are estimated nonparametrically
+    ## Saturated model for the competing event
     pi11 <- mean(sim1[which(sim1$a==1 & sim1$l==1),]$d)
     pi10 <- mean(sim1[which(sim1$a==1 & sim1$l==0),]$d)
     pi01 <- mean(sim1[which(sim1$a==0 & sim1$l==1),]$d)
@@ -88,6 +66,7 @@ sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta
         sde1 = ifelse(d==0, w_s1*y, 0),
         sde0 = ifelse(d==0, w_s0*y, 0)
       )
+    # Estimated weights
     est_weights <- data.frame(
       wcde_11 = 1/(1-pi11),
       wcde_10 = 1/(1-pi10),
@@ -138,9 +117,7 @@ sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta
       beta_5 = beta_5,
       beta_6 = beta_6,
       pL = pL,
-      pU = pU,
-      phi_0 = phi_0, 
-      phi_1 = phi_1
+      pU = pU
     )
     
     tmu111 <- tevent(c_0 = theta_0, c_1 = theta_1, c_2 = theta_2, c_3 = theta_3, c_4 = theta_4, c_5 = theta_5, c_6 = theta_6, a = 1, l = 1, u = 1)
@@ -159,18 +136,11 @@ sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta
     tpi010 <-  tcompeting(c_0 = beta_0, c_1 = beta_1, c_2 = beta_2, c_3 = beta_3, c_4 = beta_4, c_5 = beta_5, c_6 = beta_6, a = 0, l = 1, u = 0)
     tpi001 <-  tcompeting(c_0 = beta_0, c_1 = beta_1, c_2 = beta_2, c_3 = beta_3, c_4 = beta_4, c_5 = beta_5, c_6 = beta_6, a = 0, l = 0, u = 1)
     tpi000 <-  tcompeting(c_0 = beta_0, c_1 = beta_1, c_2 = beta_2, c_3 = beta_3, c_4 = beta_4, c_5 = beta_5, c_6 = beta_6, a = 0, l = 0, u = 0)
-    if(phi_0 == 0 & phi_1 == 0){
       tg11 <- pL*pU
       tg10 <- pL*(1-pU)
       tg01 <- (1-pL)*pU
       tg00 <- (1-pL)*(1-pU)
-    } else{
-      tg11 <- tcov(c_0 = phi_0, c_1 = phi_1, u = 1)*pU
-      tg10 <- tcov(c_0 = phi_0, c_1 = phi_1, u = 0)*(1-pU)
-      tg01 <- (1-tcov(c_0 = phi_0, c_1 = phi_1, u = 1))*pU
-      tg00 <- (1-tcov(c_0 = phi_0, c_1 = phi_1, u = 0))*(1-pU)
-    }
-    
+
     obsmu11 <- ((tmu111)*(1-tpi111)*pL*pU + (tmu110)*(1-tpi110)*pL*(1-pU)) / ((1-tpi111)*pL*pU + (1-tpi110)*pL*(1-pU))
     obsmu10 <- ((tmu101)*(1-tpi101)*(1-pL)*pU + (tmu100)*(1-tpi100)*(1-pL)*(1-pU)) / ((1-tpi101)*(1-pL)*pU + (1-tpi100)*(1-pL)*(1-pU))
     obsmu01 <- ((tmu011)*(1-tpi011)*pL*pU + (tmu010)*(1-tpi010)*pL*(1-pU)) / ((1-tpi011)*pL*pU + (1-tpi010)*pL*(1-pU))
@@ -181,10 +151,6 @@ sim <-  function(rep, n, num, theta_0, theta_1, theta_2, theta_3, theta_4, theta
     obspi00 <- (tpi001*(1-pL)*pU + tpi000*(1-pL)*(1-pU)) / ((1-pL)*pU + (1-pL)*(1-pU))
     tilde_cde1 <- obsmu11 * pL + obsmu10 * (1-pL) 
     tilde_cde0 <- obsmu01 * pL + obsmu00 * (1-pL)
-    tilde_cde1l1 <- obsmu11 
-    tilde_cde1l0 <- obsmu10 
-    tilde_cde0l1 <- obsmu01 
-    tilde_cde0l0 <- obsmu00
     tilde_sde11 <- obsmu11 * (1-obspi11) * pL + obsmu10 * (1-obspi10) *(1-pL)
     tilde_sde10 <- obsmu01 * (1-obspi11) * pL + obsmu00 * (1-obspi10) *(1-pL)
     tilde_sde01 <- obsmu11 * (1-obspi01) * pL + obsmu10 * (1-obspi00) *(1-pL)
