@@ -9,25 +9,25 @@ by *Takuya Kawahara, Sean McGrath, and Jessica G. Young*.
 
 ## Repository Contents
 
-### 1. Implications of Estimand Error (Section 4.1)
+### 1. Implications of estimand error (Section 4.1)
 
 Scripts:
 - `EstimandError_non_rare.R` → generates **Figure 3**
 - `EstimandError_rare.R` → generates **Web Figure 1**
 
-### 2. Relative Implications of Non-identification Error (Section 4.2)
+### 2. Relative implications of non-identification error (Section 4.2)
 
 Script:
 - `NonIdError.R` → generates **Figure 4**
 
-### 3. Variance Implications under Near Positivity Violations: A Simulation Study (Section 4.3)
+### 3. Relative implications on variance of near positivity violations: a simulation study (Section 4.3)
 
 Scripts:
 - Define parameters in `simmult1-6.R`
 - Then run `sim_function.R` (iterates **20,000** times)  
   → reproduces **Table 1**
 
-### 4. Comparative Empirical Analysis Using a Real Randomized Trial of Estrogen Therapy (Section 5)
+### 4. Comparative empirical analysis of the real randomized trial of estrogen therapy (Section 5)
 
 Script:
 - `ProstateAnalysis_bootstrap.R`  
